@@ -1,12 +1,37 @@
 environments:
-- name: acceptance
-- name: production
+  - name: pims-dev
+    loadbalancer:
+      hostedzone: caseylee.com
+      name: dev
+    cluster:
+      instanceType: t2.micro
+      desiredCapacity: 1
+      maxSize: 2
+      keyName: trey-labs
+      sshAllow: 0.0.0.0/0
+  - name: pims-prod
+    loadbalancer:
+      hostedzone: caseylee.com
+      name: '.'
+    cluster:
+      instanceType: t2.micro
+      desiredCapacity: 1
+      maxSize: 2
+      keyName: trey-labs
+      sshAllow: 0.0.0.0/0
 service:
   name: muexample
   port: 80
-  pathPatterns:
-  - /*
+  hostPatterns: 
+  - demo.*
   pipeline:
     source:
       provider: GitHub
       repo: tmcelhattan/muexample
+    build:
+      image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
+    acceptance:
+      image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
+      environment: pims-dev
+    production:
+      environment: pims-prod
