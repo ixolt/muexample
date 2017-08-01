@@ -1,0 +1,12 @@
+environments:
+- name: acceptance
+- name: production
+service:
+  name: muexample
+  port: 80
+  pathPatterns:
+  - /*
+  pipeline:
+    source:
+      provider: GitHub
+      repo: tmcelhattan/muexample
