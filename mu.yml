@@ -4,7 +4,7 @@ environments:
       hostedzone: caseylee.com
       name: dev
     cluster:
-      instanceType: t2.micro
+      instanceType: t2.large
       desiredCapacity: 1
       maxSize: 2
       keyName: trey-labs
@@ -14,7 +14,7 @@ environments:
       hostedzone: demo.elasticoperations.com
       name: '.'
     cluster:
-      instanceType: t2.micro
+      instanceType: t2.large
       desiredCapacity: 1
       maxSize: 2
       keyName: trey-labs
