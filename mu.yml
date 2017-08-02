@@ -21,6 +21,7 @@ environments:
       sshAllow: 0.0.0.0/0
 service:
   name: muexample
+  healthEndpoint: /index.html
   port: 80
   hostPatterns: 
   - demo.*
