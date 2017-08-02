@@ -11,7 +11,7 @@ environments:
       sshAllow: 0.0.0.0/0
   - name: pims-prod
     loadbalancer:
-      hostedzone: caseylee.com
+      hostedzone: demo.elasticoperations.com
       name: '.'
     cluster:
       instanceType: t2.micro
@@ -33,5 +33,6 @@ service:
     acceptance:
       image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
       environment: pims-dev
+      disabled: true
     production:
       environment: pims-prod
