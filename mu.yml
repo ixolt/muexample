@@ -14,7 +14,7 @@ environments:
       hostedzone: demo.elasticoperations.com
       name: '.'
     cluster:
-      instanceType: t2.large
+      instanceType: c4.large
       desiredCapacity: 1
       maxSize: 2
       keyName: trey-labs
