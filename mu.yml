@@ -21,10 +21,10 @@ environments:
       sshAllow: 0.0.0.0/0
 service:
   name: muexample
-  healthEndpoint: /index.html
+  healthEndpoint: /
   port: 80
   hostPatterns: 
-  - demo.*
+  - treys.*
   pipeline:
     source:
       provider: GitHub
