@@ -1,6 +1,6 @@
 FROM nginx
 
-RUN yum update && yum -y install cron
+RUN apt-get update && apt-get -y install cron
 # Add crontab file in the cron directory
 ADD crontab /etc/cron.d/hello-cron
  
