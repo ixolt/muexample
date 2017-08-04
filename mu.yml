@@ -10,11 +10,8 @@ environments:
       keyName: trey-labs
       sshAllow: 0.0.0.0/0
   - name: pims-prod
-    loadbalancer:
-      hostedzone: demo.elasticoperations.com
-      name: '.'
     cluster:
-      instanceType: c4.large
+      instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
       keyName: trey-labs
@@ -23,8 +20,8 @@ service:
   name: muexample
   healthEndpoint: /
   port: 80
-  hostPatterns: 
-  - treys.*
+  pathPatterns:
+    - /*
   pipeline:
     source:
       provider: GitHub
