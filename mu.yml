@@ -30,7 +30,6 @@ service:
       environment: pims-prod
 
 templates:
-  mu-pipeline-muexample:
     Resources:
       Pipeline:
         Type: AWS::CodePipeline::Pipeline
