@@ -1,21 +1,14 @@
 environments:
   - name: pims-dev
-    loadbalancer:
-      hostedzone: caseylee.com
-      name: dev
     cluster:
-      instanceType: t2.large
+      instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
-      keyName: trey-labs
-      sshAllow: 0.0.0.0/0
   - name: pims-prod
     cluster:
       instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
-      keyName: trey-labs
-      sshAllow: 0.0.0.0/0
 service:
   name: muexample
   healthEndpoint: /
@@ -27,6 +20,8 @@ service:
       provider: GitHub
       repo: tmcelhattan/muexample
     build:
+      image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
+    test:
       image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
     acceptance:
       image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
