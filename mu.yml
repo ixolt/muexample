@@ -1,10 +1,10 @@
 environments:
-  - name: pims-dev
+  - name: muexample-dev
     cluster:
       instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
-  - name: pims-prod
+  - name: muexample-prod
     cluster:
       instanceType: t2.medium
       desiredCapacity: 1
@@ -23,162 +23,7 @@ service:
       image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
     acceptance:
       image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
-      environment: pims-dev
+      environment: muexample-dev
     production:
-      environment: pims-prod
-# templates:
-#   mu-pipeline-muexample:
-#     Resources:
-#       Pipeline:
-#         Type: AWS::CodePipeline::Pipeline
-#         Properties:
-#           RoleArn: !GetAtt CodePipelineRole.Arn
-#           Stages:
-#           - Name: Source
-#             Actions:
-#             - Name: Source
-#               InputArtifacts: []
-#               OutputArtifacts:
-#               - Name: SourceOutput
-#               ActionTypeId:
-#                 Fn::If:
-#                 - IsGitHub
-#                 - Category: Source
-#                   Owner: ThirdParty
-#                   Version: '1'
-#                   Provider: GitHub
-#                 - Category: Source
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeCommit
-#               Configuration:
-#                 Fn::If:
-#                 - IsGitHub
-#                 - Owner: {"Fn::Select": ["0", {"Fn::Split":["/", {"Ref": "SourceRepo"}]}]}
-#                   Repo: {"Fn::Select": ["1", {"Fn::Split":["/", {"Ref": "SourceRepo"}]}]}
-#                   Branch: !Ref SourceBranch
-#                   OAuthToken: !Ref GitHubToken
-#                 - RepositoryName: !Ref SourceRepo
-#                   BranchName: !Ref SourceBranch
-#               RunOrder: 1
-#           - !If
-#             - IsBuildEnabled
-#             - Name: Build
-#               Actions:
-#               - Name: Artifact
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: SourceOutput
-#                 OutputArtifacts:
-#                 - Name: ArtifactOutput
-#                 Configuration:
-#                   ProjectName: !Ref CodeBuildArtifact
-#                 RunOrder: 1
-#               - Name: Image
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: ArtifactOutput
-#                 OutputArtifacts:
-#                 - Name: ImageOutput
-#                 Configuration:
-#                   ProjectName: !Ref CodeBuildImage
-#                 RunOrder: 2
-#             - !Ref AWS::NoValue
-#           - !If
-#             - IsAcptEnabled
-#             - Name: Acceptance
-#               Actions:
-#               - Name: Approve
-#                 ActionTypeId:
-#                   Category: Approval
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: Manual
-#                 Configuration:
-#                   CustomData: Approve deployment to production
-#                 RunOrder: 1
-#               - Name: Deploy
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: SourceOutput
-#                 OutputArtifacts:
-#                 - Name: DeployAcceptanceOutput
-#                 Configuration:
-#                   ProjectName: !Ref DeployAcceptance
-#                 RunOrder: 1
-#               - Name: Test
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: DeployAcceptanceOutput
-#                 OutputArtifacts:
-#                 - Name: TestAcceptanceOutput
-#                 Configuration:
-#                   ProjectName: !Ref TestAcceptance
-#                 RunOrder: 2
-#             - !Ref AWS::NoValue
-#           - !If
-#             - IsProdEnabled
-#             - Name: Production
-#               Actions:
-#               - Name: Approve
-#                 ActionTypeId:
-#                   Category: Approval
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: Manual
-#                 Configuration:
-#                   CustomData: Approve deployment to production
-#                 RunOrder: 1
-#               - Name: Deploy
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: SourceOutput
-#                 OutputArtifacts:
-#                 - Name: DeployProductionOutput
-#                 Configuration:
-#                   ProjectName: !Ref DeployProduction
-#                 RunOrder: 2
-#               - Name: Test
-#                 ActionTypeId:
-#                   Category: Build
-#                   Owner: AWS
-#                   Version: '1'
-#                   Provider: CodeBuild
-#                 InputArtifacts:
-#                 - Name: DeployProductionOutput
-#                 OutputArtifacts:
-#                 - Name: TestProductionOutput
-#                 Configuration:
-#                   ProjectName: !Ref TestProduction
-#                 RunOrder: 3
-#             - !Ref AWS::NoValue
-#           ArtifactStore:
-#             Type: S3
-#             Location: !ImportValue mu-bucket-codepipeline
-#     Outputs:
-#       CodePipelineUrl:
-#         Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
-#         Description: CodePipeline URL
-#       PipelineName:
-#         Value: !Sub ${Pipeline}
-#         Description: Pipeline Name
+      environment: muexample-prod
+      disabled: true
