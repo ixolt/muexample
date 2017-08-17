@@ -4,11 +4,9 @@ environments:
       instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
-  - name: muexample-prod
-    cluster:
-      instanceType: t2.medium
-      desiredCapacity: 1
-      maxSize: 2
+      imageId: ami-75785b10
+      keyName: trey-labs
+      sshAllow: 0.0.0.0/0
 service:
   name: muexample
   healthEndpoint: /
