@@ -1,2 +1,0 @@
-*/1 * * * * root echo "hey people" >> /var/log/cron.log
-*/2 * * * * root echo "Hello world" >> /var/log/cron.log
