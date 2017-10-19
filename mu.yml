@@ -1,8 +1,5 @@
 environments:
   - name: dev
-    loadbalancer:
-      hostedzone: caseylee.com
-      name: '.'
     cluster:
       instanceType: t2.micro
       desiredCapacity: 1
@@ -12,9 +9,9 @@ environments:
 service:
   name: muexample
   port: 80
-  healthEndpoint: /index.html
-  hostPatterns: 
-  - demo.*
+  healthEndpoint: /
+  pathPatterns: 
+  - /*
   pipeline:
     source:
       provider: GitHub
