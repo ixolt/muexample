@@ -1,15 +1,16 @@
 environments:
   - name: dev
     cluster:
-      instanceType: t2.micro
+      instanceType: t2.medium
       desiredCapacity: 1
       maxSize: 2
-      keyName: trey-labs
+      keyName: skyland-tech-access
       sshAllow: 0.0.0.0/0
+      imageId: ami-0c8d8877
 service:
   name: muexample
   port: 80
-  healthEndpoint: /somethingtest
+  healthEndpoint: /
   pathPatterns: 
   - /*
   pipeline:
@@ -24,4 +25,14 @@ service:
     production:
       environment: pims-prod
       disabled: true
+
+templates:
+  mu-vpc-dev:
+    Resources:
+      VPCPeeringConnection:
+        Type: "AWS::EC2::VPCPeeringConnection"
+        Properties: 
+          PeerVpcId: vpc-d5451aac
+          VpcId:
+            Ref: VPC
 
