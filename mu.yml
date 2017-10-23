@@ -10,7 +10,7 @@ environments:
 service:
   name: muexample
   port: 80
-  healthEndpoint: /
+  healthEndpoint: /index.html
   pathPatterns: 
   - /*
   pipeline:
