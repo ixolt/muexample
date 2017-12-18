@@ -46,7 +46,7 @@ templates:
             Fn::GetAtt: [ EcsTaskRole, Arn ]
           ContainerDefinitions:
             - Command:
-                [ "rake", "recurring_tasks:update_statuses[TargetControlLimit]" ]
+                [ "echo", "$HOME" ]
               Cpu: 10
               MemoryReservation: 1024
               Name: target_control_ecs_task
@@ -59,7 +59,7 @@ templates:
             Fn::GetAtt: [ EcsTaskRole, Arn ]
           ContainerDefinitions:
             - Command:
-                [ "rake", "recurring_tasks:update_statuses[SpecificationLimit]" ]
+                [ "echo", "$PATH" ]
               Cpu: 10
               MemoryReservation: 1024
               Name: spec_limit_ecs_task
@@ -98,32 +98,32 @@ templates:
         Type: "AWS::Events::Rule"
         Properties: 
           Description: "Runs the target control limit rake task every 10 minutes"
-          ScheduleExpression: "rate(10 minutes)"
+          ScheduleExpression: "rate(1 minutes)"
           State: "ENABLED"
           RoleArn:
             Ref: CloudWatchEventRole
-          Targets: 
+          Targets:
             - 
               Arn: 
-                Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
+                Fn::GetAtt: [ TargetLimitEcsTask, Arn ]
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
-                  Fn::GetAtt: [ TargetLimitEcsTask, Arn ]
+                  Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
       SpecLimitEventRule: 
         Type: "AWS::Events::Rule"
         Properties: 
           Description: "Runs the spec limit rake task every 10 minutes"
-          ScheduleExpression: "rate(10 minutes)"
+          ScheduleExpression: "rate(1 minutes)"
           State: "ENABLED"
           RoleArn:
             Ref: CloudWatchEventRole
           Targets: 
             - 
               Arn: 
-                Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
+                Fn::GetAtt: [ SpecLimitEcsTask, Arn ]
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
-                  Fn::GetAtt: [ TargetLimitEcsTask, Arn ]
+                  Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
 
