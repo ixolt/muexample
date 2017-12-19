@@ -137,15 +137,13 @@ templates:
             Ref: CloudWatchEventRole
           Targets: 
             - Id: TargetControlEventRuleId
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
               # Arn: 
               #   Fn::Sub:
-              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-              #     - EcsClusterName:
-              #         Fn::ImportValue:
-              #           Fn::Sub: "${mu-environment-dev}-EcsCluster"
+              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName: mu-environment-dev
               Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
               EcsParameters:
                 TaskCount: 1
@@ -164,12 +162,10 @@ templates:
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
-              # Arn: 
-              #   Fn::Sub:
-              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-              #     - EcsClusterName:
-              #         Fn::ImportValue:
-              #           Fn::Sub: "${mu-environment-dev}-EcsCluster"
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName: mu-environment-dev
               Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
               EcsParameters:
                 TaskCount: 1
