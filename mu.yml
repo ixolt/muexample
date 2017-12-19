@@ -18,14 +18,14 @@ service:
       disabled: true
 
 templates:
-  mu-vpc-dev:
-    Resources:
-      VPCPeeringConnection:
-        Type: "AWS::EC2::VPCPeeringConnection"
-        Properties: 
-          PeerVpcId: vpc-d5451aac
-          VpcId:
-            Ref: VPC
+  # mu-vpc-dev:
+  #   Resources:
+  #     VPCPeeringConnection:
+  #       Type: "AWS::EC2::VPCPeeringConnection"
+  #       Properties: 
+  #         PeerVpcId: vpc-d5451aac
+  #         VpcId:
+  #           Ref: VPC
   mu-service-muexample-dev:
     Resources:
       # TargetLimitEcsTask:
