@@ -134,7 +134,7 @@ templates:
           ScheduleExpression: "rate(1 minutes)"
           State: "ENABLED"
           RoleArn:
-            Ref: CloudWatchEventRole
+            Fn::GetAtt: [ CloudWatchEventRole, Arn ]
           Targets: 
             - Id: TargetControlEventRuleId
               # Arn: 
@@ -156,7 +156,7 @@ templates:
           ScheduleExpression: "rate(1 minutes)"
           State: "ENABLED"
           RoleArn:
-            Ref: CloudWatchEventRole
+            Fn::GetAtt: [ CloudWatchEventRole, Arn ]
           Targets: 
             - Id: SpecLimitEventRuleId
               Arn: 
