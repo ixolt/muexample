@@ -1,29 +1,20 @@
 environments:
-  - name: dev
-    cluster:
-      instanceType: t2.medium
-      desiredCapacity: 1
-      maxSize: 2
-      keyName: skyland-tech-access
-      sshAllow: 0.0.0.0/0
-      imageId: ami-0c8d8877
+- name: dev
+  instanceType: t2.micro
+- name: production
 service:
   name: muexample
   port: 80
-  healthEndpoint: /index.html
-  pathPatterns: 
+  pathPatterns:
   - /*
   pipeline:
     source:
       provider: GitHub
       repo: tmcelhattan/muexample
-    build:
-      image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
     acceptance:
-      image: aws/codebuild/eb-ruby-2.3-amazonlinux-64:2.1.6
       environment: dev
     production:
-      environment: pims-prod
+      environment: production
       disabled: true
 
 templates:
@@ -37,32 +28,32 @@ templates:
             Ref: VPC
   mu-service-muexample-dev:
     Resources:
-      TargetLimitEcsTask:
-        Type: "AWS::ECS::TaskDefinition"
-        Properties: 
-          ExecutionRoleArn:
-            Fn::GetAtt: [ EcsTaskRole, Arn ]
-          TaskRoleArn: 
-            Fn::GetAtt: [ EcsTaskRole, Arn ]
-          ContainerDefinitions:
-            - Command:
-                [ "echo", "$HOME" ]
-              Cpu: 10
-              MemoryReservation: 1024
-              Name: target_control_ecs_task
-      SpecLimitEcsTask:
-        Type: "AWS::ECS::TaskDefinition"
-        Properties: 
-          ExecutionRoleArn:
-            Fn::GetAtt: [ EcsTaskRole, Arn ]
-          TaskRoleArn: 
-            Fn::GetAtt: [ EcsTaskRole, Arn ]
-          ContainerDefinitions:
-            - Command:
-                [ "echo", "$PATH" ]
-              Cpu: 10
-              MemoryReservation: 1024
-              Name: spec_limit_ecs_task
+      # TargetLimitEcsTask:
+      #   Type: "AWS::ECS::TaskDefinition"
+      #   Properties: 
+      #     ExecutionRoleArn:
+      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
+      #     TaskRoleArn: 
+      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
+      #     ContainerDefinitions:
+      #       - Command:
+      #           [ "echo", "$HOME" ]
+      #         Cpu: 10
+      #         MemoryReservation: 1024
+      #         Name: target_control_ecs_task
+      # SpecLimitEcsTask:
+      #   Type: "AWS::ECS::TaskDefinition"
+      #   Properties: 
+      #     ExecutionRoleArn:
+      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
+      #     TaskRoleArn: 
+      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
+      #     ContainerDefinitions:
+      #       - Command:
+      #           [ "echo", "$PATH" ]
+      #         Cpu: 10
+      #         MemoryReservation: 1024
+      #         Name: spec_limit_ecs_task
       CloudWatchEventRole:
         Type: "AWS::IAM::Role"
         Properties: 
@@ -97,19 +88,21 @@ templates:
       TargetControlEventRule: 
         Type: "AWS::Events::Rule"
         Properties: 
-          Description: "Runs the target control limit rake task every 10 minutes"
+          Description: "Runs the spec limit rake task every 10 minutes"
           ScheduleExpression: "rate(1 minutes)"
           State: "ENABLED"
           RoleArn:
             Ref: CloudWatchEventRole
-          Targets:
-            - 
+          Targets: 
+            - Id: TargetControlEventRuleId
               Arn: 
-                Fn::GetAtt: [ TargetLimitEcsTask, Arn ]
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
-                  Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
+                  Ref: MicroserviceTaskDefinition
       SpecLimitEventRule: 
         Type: "AWS::Events::Rule"
         Properties: 
@@ -119,11 +112,14 @@ templates:
           RoleArn:
             Ref: CloudWatchEventRole
           Targets: 
-            - 
+            - Id: SpecLimitEventRuleId
               Arn: 
-                Fn::GetAtt: [ SpecLimitEcsTask, Arn ]
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
-                  Fn::GetAtt: [ MicroserviceTaskDefinition, Arn ]
+                  Ref: MicroserviceTaskDefinition
+
 
