@@ -49,7 +49,7 @@ templates:
                 Action: ecs:RunTask
                 Resource: "*"
           Roles: 
-              Ref: "CloudWatchEventRole"
+            - Ref: "CloudWatchEventRole"
       TargetControlEventRule: 
         Type: "AWS::Events::Rule"
         Properties: 
@@ -59,7 +59,7 @@ templates:
           Targets: 
             - Id: TargetControlEventRuleId
               RoleArn:
-                !GetAtt CloudWatchEventRole.Arn
+                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
@@ -78,7 +78,7 @@ templates:
           Targets: 
             - Id: SpecLimitEventRuleId
               RoleArn:
-                !GetAtt CloudWatchEventRole.Arn
+                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
@@ -88,45 +88,46 @@ templates:
                 TaskCount: 1
                 TaskDefinitionArn: 
                   Ref: MicroserviceTaskDefinition
-  # mu-loadbalancer-sharedvpc:
-  #   Resources:
-  #     Elb:
-  #       Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
-  #       Properties:
-  #         LoadBalancerAttributes:
-  #           - Key: access_logs.s3.enabled
-  #             Value: true
-  #           - Key: access_logs.s3.bucket
-  #             Value:
-  #           - Key: deletion_protection.enabled
-  #             Value: true 
-  #     ElbLogsS3Bucket:
-  #       Type: "AWS::S3::Bucket"
-  #       Properties: 
-  #         BucketName:
-  #           Fn::Sub:
-  #             - "${AWS::StackName}-ElbLogs"
-  #     ElbS3BucketPolicy:
-  #       SampleBucketPolicy: 
-  #         Type: "AWS::S3::BucketPolicy"
-  #         Properties: 
-  #           Bucket: 
-  #             Ref: ElbLogsS3Bucket
-  #           PolicyDocument: 
-  #             Statement: 
-  #               - 
-  #                 Action: 
-  #                   - "*"
-  #                 Effect: "Allow"
-  #                 Resource: 
-  #                   Fn::Join: 
-  #                     - ""
-  #                     - 
-  #                       - "arn:aws:s3:::"
-  #                       - 
-  #                         Ref: "ElbLogsS3Bucket"
-  #                       - "/*"
-  #                 Principal: "*"
+  mu-loadbalancer-sharedvpc:
+    Resources:
+      Elb:
+        Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+        Properties:
+          LoadBalancerAttributes:
+            - Key: access_logs.s3.enabled
+              Value: true
+            - Key: access_logs.s3.bucket
+              Value:
+                Ref: ElbLogsS3Bucket
+            - Key: deletion_protection.enabled
+              Value: true 
+      ElbLogsS3Bucket:
+        Type: "AWS::S3::Bucket"
+        Properties: 
+          BucketName:
+            Fn::Sub:
+              - "${AWS::StackName}-ElbLogs"
+      ElbS3BucketPolicy:
+        SampleBucketPolicy: 
+          Type: "AWS::S3::BucketPolicy"
+          Properties: 
+            Bucket: 
+              Ref: ElbLogsS3Bucket
+            PolicyDocument: 
+              Statement: 
+                - 
+                  Action: 
+                    - "*"
+                  Effect: "Allow"
+                  Resource: 
+                    Fn::Join: 
+                      - ""
+                      - 
+                        - "arn:aws:s3:::"
+                        - 
+                          Ref: "ElbLogsS3Bucket"
+                        - "/*"
+                  Principal: "*"
   # mu-vpc-dev:
   #   Resources:
   #     VPCPeeringConnection:

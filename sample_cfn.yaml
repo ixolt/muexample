@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: MU scheduled task in a specific environment containing a CloudWatch event and a RuleTarget
+Resources:
+  CloudWatchEventRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument:
+        "Statement": [
+          {
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [
+                    "events.amazonaws.com"
+                ]
+            }
+          }
+        ]
+  CloudWatchEventPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyName: "ecs_scheduled_task_policy"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Action: ecs:RunTask
+            Resource: "*"
+      Roles: 
+        - Ref: "CloudWatchEventRole"
+  TargetControlEventRule: 
+    Type: "AWS::Events::Rule"
+    Properties: 
+      Description: "Runs the spec limit rake task every 10 minutes"
+      ScheduleExpression: rate(10 minutes)
+      State: "ENABLED"
+      Targets: 
+        - Id: TargetControlEventRuleId
+          RoleArn:
+            !GetAtt CloudWatchEventRole.Arn
+          Arn: 
+            Fn::Sub:
+              - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              - EcsClusterName: 'mu-environment-dev'
+          Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
+          # EcsParameters:
+          #   TaskCount: 1
+          #   TaskDefinitionArn: 
+          #     Ref: MicroserviceTaskDefinition
+  SpecLimitEventRule: 
+    Type: "AWS::Events::Rule"
+    Properties: 
+      Description: "Runs the spec limit rake task every 10 minutes"
+      ScheduleExpression: rate(10 minutes)
+      State: "ENABLED"
+      Targets: 
+        - Id: SpecLimitEventRuleId
+          RoleArn:
+            !GetAtt CloudWatchEventRole.Arn
+          Arn: 
+            Fn::Sub:
+              - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              - EcsClusterName: mu-environment-dev
+          Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
+          # EcsParameters:
+          #   TaskCount: 1
+          #   TaskDefinitionArn: 
+          #     Ref: MicroserviceTaskDefinition
