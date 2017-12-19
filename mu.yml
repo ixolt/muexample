@@ -18,6 +18,19 @@ service:
       disabled: true
 
 templates:
+  # mu-loadbalancer-sharedvpc:
+  #   Resources:
+  #     Elb:
+  #       Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+  #       Properties:
+  #         LoadBalancerAttributes:
+  #           - Key: access_logs.s3.enabled
+  #             Value: true
+  #           - Key: access_logs.s3.bucket
+  #             Value:
+  #           - Key: deletion_protection.enabled
+  #             Value: true 
+
   # mu-vpc-dev:
   #   Resources:
   #     VPCPeeringConnection:
@@ -98,6 +111,8 @@ templates:
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName:
+                      Fn::ImportValue: !Ref EcsCluster
               Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
               EcsParameters:
                 TaskCount: 1
@@ -116,6 +131,8 @@ templates:
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName:
+                      Fn::ImportValue: !Ref EcsCluster
               Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
               EcsParameters:
                 TaskCount: 1
