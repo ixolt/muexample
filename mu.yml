@@ -108,7 +108,6 @@ templates:
             Fn::Sub:
               - "${AWS::StackName}-ElbLogs"
       ElbS3BucketPolicy:
-        SampleBucketPolicy: 
           Type: "AWS::S3::BucketPolicy"
           Properties: 
             Bucket: 
