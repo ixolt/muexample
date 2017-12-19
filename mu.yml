@@ -106,7 +106,7 @@ templates:
         Properties: 
           BucketName:
             Fn::Sub:
-              "${AWS::StackName}-ElbLogs"
+              "${AWS::StackName}-elblogs"
       ElbS3BucketPolicy:
           Type: "AWS::S3::BucketPolicy"
           Properties: 
