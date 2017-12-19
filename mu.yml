@@ -118,14 +118,8 @@ templates:
                   Action: 
                     - "*"
                   Effect: "Allow"
-                  Resource: 
-                    Fn::Join: 
-                      - ""
-                      - 
-                        - "arn:aws:s3:::"
-                        - 
-                          Ref: "ElbLogsS3Bucket"
-                        - "/*"
+                  Resource:
+                    Fn::Sub: ${ElbLogsS3Bucket.Arn}/*
                   Principal: "*"
   # mu-vpc-dev:
   #   Resources:
