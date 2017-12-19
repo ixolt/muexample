@@ -36,6 +36,27 @@ templates:
   #         BucketName:
   #           Fn::Sub:
   #             - "${AWS::StackName}-ElbLogs"
+  #     ElbS3BucketPolicy:
+  #       SampleBucketPolicy: 
+  #         Type: "AWS::S3::BucketPolicy"
+  #         Properties: 
+  #           Bucket: 
+  #             Ref: ElbLogsS3Bucket
+  #           PolicyDocument: 
+  #             Statement: 
+  #               - 
+  #                 Action: 
+  #                   - "s3:GetObject"
+  #                 Effect: "Allow"
+  #                 Resource: 
+  #                   Fn::Join: 
+  #                     - ""
+  #                     - 
+  #                       - "arn:aws:s3:::"
+  #                       - 
+  #                         Ref: "myExampleBucket"
+  #                       - "/*"
+  #                 Principal: "*"
 
 
 
@@ -116,12 +137,12 @@ templates:
             Ref: CloudWatchEventRole
           Targets: 
             - Id: TargetControlEventRuleId
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-                  - EcsClusterName:
-                      Fn::ImportValue:
-                        Fn::Sub: "${mu-environment-dev}-EcsCluster"
+              # Arn: 
+              #   Fn::Sub:
+              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              #     - EcsClusterName:
+              #         Fn::ImportValue:
+              #           Fn::Sub: "${mu-environment-dev}-EcsCluster"
               Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
               EcsParameters:
                 TaskCount: 1
@@ -137,12 +158,12 @@ templates:
             Ref: CloudWatchEventRole
           Targets: 
             - Id: SpecLimitEventRuleId
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-                  - EcsClusterName:
-                      Fn::ImportValue:
-                        Fn::Sub: "${mu-environment-dev}-EcsCluster"
+              # Arn: 
+              #   Fn::Sub:
+              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+              #     - EcsClusterName:
+              #         Fn::ImportValue:
+              #           Fn::Sub: "${mu-environment-dev}-EcsCluster"
               Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
               EcsParameters:
                 TaskCount: 1
