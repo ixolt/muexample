@@ -46,7 +46,7 @@ templates:
   #             Statement: 
   #               - 
   #                 Action: 
-  #                   - "s3:GetObject"
+  #                   - "*"
   #                 Effect: "Allow"
   #                 Resource: 
   #                   Fn::Join: 
@@ -54,7 +54,7 @@ templates:
   #                     - 
   #                       - "arn:aws:s3:::"
   #                       - 
-  #                         Ref: "myExampleBucket"
+  #                         Ref: "ElbLogsS3Bucket"
   #                       - "/*"
   #                 Principal: "*"
 
@@ -137,6 +137,9 @@ templates:
             Ref: CloudWatchEventRole
           Targets: 
             - Id: TargetControlEventRuleId
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
               # Arn: 
               #   Fn::Sub:
               #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
@@ -158,6 +161,9 @@ templates:
             Ref: CloudWatchEventRole
           Targets: 
             - Id: SpecLimitEventRuleId
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
               # Arn: 
               #   Fn::Sub:
               #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
