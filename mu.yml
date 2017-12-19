@@ -88,7 +88,7 @@ templates:
                 TaskCount: 1
                 TaskDefinitionArn: 
                   Ref: MicroserviceTaskDefinition
-  mu-loadbalancer-sharedvpc:
+  mu-loadbalancer-dev:
     Resources:
       Elb:
         Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
