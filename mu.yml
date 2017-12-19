@@ -18,6 +18,76 @@ service:
       disabled: true
 
 templates:
+  mu-service-muexample-dev:
+    Resources:
+      CloudWatchEventRole:
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument:
+            "Statement": [
+              {
+                "Action": [
+                    "sts:AssumeRole"
+                ],
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": [
+                        "events.amazonaws.com"
+                    ]
+                }
+              }
+            ]
+      CloudWatchEventPolicy:
+        Type: "AWS::IAM::Policy"
+        Properties: 
+          PolicyName: "ecs_scheduled_task_policy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: ecs:RunTask
+                Resource: "*"
+          Roles: 
+              Ref: "CloudWatchEventRole"
+      TargetControlEventRule: 
+        Type: "AWS::Events::Rule"
+        Properties: 
+          Description: "Runs the spec limit rake task every 10 minutes"
+          ScheduleExpression: rate(10 minutes)
+          State: "ENABLED"
+          Targets: 
+            - Id: TargetControlEventRuleId
+              RoleArn:
+                !GetAtt CloudWatchEventRole.Arn
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName: 'mu-environment-dev'
+              Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
+              EcsParameters:
+                TaskCount: 1
+                TaskDefinitionArn: 
+                  Ref: MicroserviceTaskDefinition
+      SpecLimitEventRule: 
+        Type: "AWS::Events::Rule"
+        Properties: 
+          Description: "Runs the spec limit rake task every 10 minutes"
+          ScheduleExpression: rate(10 minutes)
+          State: "ENABLED"
+          Targets: 
+            - Id: SpecLimitEventRuleId
+              RoleArn:
+                !GetAtt CloudWatchEventRole.Arn
+              Arn: 
+                Fn::Sub:
+                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
+                  - EcsClusterName: mu-environment-dev
+              Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
+              EcsParameters:
+                TaskCount: 1
+                TaskDefinitionArn: 
+                  Ref: MicroserviceTaskDefinition
   # mu-loadbalancer-sharedvpc:
   #   Resources:
   #     Elb:
@@ -57,9 +127,6 @@ templates:
   #                         Ref: "ElbLogsS3Bucket"
   #                       - "/*"
   #                 Principal: "*"
-
-
-
   # mu-vpc-dev:
   #   Resources:
   #     VPCPeeringConnection:
@@ -68,108 +135,4 @@ templates:
   #         PeerVpcId: vpc-d5451aac
   #         VpcId:
   #           Ref: VPC
-  mu-service-muexample-dev:
-    Resources:
-      # TargetLimitEcsTask:
-      #   Type: "AWS::ECS::TaskDefinition"
-      #   Properties: 
-      #     ExecutionRoleArn:
-      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
-      #     TaskRoleArn: 
-      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
-      #     ContainerDefinitions:
-      #       - Command:
-      #           [ "echo", "$HOME" ]
-      #         Cpu: 10
-      #         MemoryReservation: 1024
-      #         Name: target_control_ecs_task
-      # SpecLimitEcsTask:
-      #   Type: "AWS::ECS::TaskDefinition"
-      #   Properties: 
-      #     ExecutionRoleArn:
-      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
-      #     TaskRoleArn: 
-      #       Fn::GetAtt: [ EcsTaskRole, Arn ]
-      #     ContainerDefinitions:
-      #       - Command:
-      #           [ "echo", "$PATH" ]
-      #         Cpu: 10
-      #         MemoryReservation: 1024
-      #         Name: spec_limit_ecs_task
-      CloudWatchEventRole:
-        Type: "AWS::IAM::Role"
-        Properties: 
-          AssumeRolePolicyDocument:
-            "Statement": [
-              {
-                "Action": [
-                    "sts:AssumeRole"
-                ],
-                "Effect": "Allow",
-                "Principal": {
-                    "Service": [
-                        "events.amazonaws.com"
-                    ]
-                }
-              }
-            ]
-      CloudWatchEventPolicy:
-        Type: "AWS::IAM::Policy"
-        Properties: 
-          PolicyName: "ecs_scheduled_task_policy"
-          PolicyDocument: 
-            Version: "2012-10-17"
-            Statement: 
-              - 
-                Effect: "Allow"
-                Action: ecs:RunTask
-                Resource: "*"
-          Roles: 
-            - 
-              Ref: "CloudWatchEventRole"
-      TargetControlEventRule: 
-        Type: "AWS::Events::Rule"
-        Properties: 
-          Description: "Runs the spec limit rake task every 10 minutes"
-          ScheduleExpression: "rate(1 minutes)"
-          State: "ENABLED"
-          RoleArn:
-            Fn::GetAtt: ["CloudWatchEventRole", "Arn"]
-          Targets: 
-            - Id: TargetControlEventRuleId
-              # Arn: 
-              #   Fn::Sub:
-              #     - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-                  - EcsClusterName: mu-environment-dev
-              Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
-              EcsParameters:
-                TaskCount: 1
-                TaskDefinitionArn: 
-                  Ref: MicroserviceTaskDefinition
-      SpecLimitEventRule: 
-        Type: "AWS::Events::Rule"
-        Properties: 
-          Description: "Runs the spec limit rake task every 10 minutes"
-          ScheduleExpression: "rate(1 minutes)"
-          State: "ENABLED"
-          RoleArn:
-            Fn::GetAtt: ["CloudWatchEventRole", "Arn"]
-          Targets: 
-            - Id: SpecLimitEventRuleId
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/mu-environment-dev"
-              Arn: 
-                Fn::Sub:
-                  - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
-                  - EcsClusterName: mu-environment-dev
-              Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
-              EcsParameters:
-                TaskCount: 1
-                TaskDefinitionArn: 
-                  Ref: MicroserviceTaskDefinition
-
 
