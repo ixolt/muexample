@@ -59,7 +59,7 @@ templates:
           Targets: 
             - Id: TargetControlEventRuleId
               RoleArn:
-                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
+                Fn::GetAtt: [ EcsTaskRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
@@ -78,7 +78,7 @@ templates:
           Targets: 
             - Id: SpecLimitEventRuleId
               RoleArn:
-                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
+                Fn::GetAtt: [ EcsTaskRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
