@@ -1,10 +1,11 @@
 environments:
 - name: dev
-  instanceType: t2.micro
+  instanceType: m4.large
 - name: production
 service:
   name: muexample
   port: 80
+  healthEndpoint: /index.html
   pathPatterns:
   - /*
   pipeline:
@@ -54,17 +55,17 @@ templates:
         Type: "AWS::Events::Rule"
         Properties: 
           Description: "Runs the spec limit rake task every 10 minutes"
-          ScheduleExpression: rate(10 minutes)
+          ScheduleExpression: rate(2 minutes)
           State: "ENABLED"
           Targets: 
             - Id: TargetControlEventRuleId
               RoleArn:
-                Fn::GetAtt: [ EcsTaskRole, Arn ]
+                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
                   - EcsClusterName: 'mu-environment-dev'
-              Input: '{ "containerOverrides": [ { "name": "specs", "command": [ "echo", "$PATH" ] } ] }'
+              Input: '{ "containerOverrides": [ { "name": "muexample", "command": [ "echo", "Hello" ] } ] }'
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
@@ -73,17 +74,17 @@ templates:
         Type: "AWS::Events::Rule"
         Properties: 
           Description: "Runs the spec limit rake task every 10 minutes"
-          ScheduleExpression: rate(10 minutes)
+          ScheduleExpression: rate(2 minutes)
           State: "ENABLED"
           Targets: 
             - Id: SpecLimitEventRuleId
               RoleArn:
-                Fn::GetAtt: [ EcsTaskRole, Arn ]
+                Fn::GetAtt: [ CloudWatchEventRole, Arn ]
               Arn: 
                 Fn::Sub:
                   - "arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${EcsClusterName}"
                   - EcsClusterName: mu-environment-dev
-              Input: '{ "containerOverrides": [ { "name": "targets", "command": [ "echo", "$HOME" ] } ] }'
+              Input: '{ "containerOverrides": [ { "name": "muexample", "command": [ "echo", "Sample" ] } ] }'
               EcsParameters:
                 TaskCount: 1
                 TaskDefinitionArn: 
@@ -121,12 +122,59 @@ templates:
                   Resource:
                     Fn::Sub: ${ElbLogsS3Bucket.Arn}/*
                   Principal: "*"
-  # mu-vpc-dev:
-  #   Resources:
-  #     VPCPeeringConnection:
-  #       Type: "AWS::EC2::VPCPeeringConnection"
-  #       Properties: 
-  #         PeerVpcId: vpc-d5451aac
-  #         VpcId:
-  #           Ref: VPC
+  mu-vpc-dev:
+    Resources:
+      VpcFlowLogs:
+        Type: "AWS::EC2::FlowLog"
+        Properties:
+          DeliverLogsPermissionArn:
+            Fn::GetAtt: [ CloudWatchLogsRole, Arn ] 
+          LogGroupName: 
+            Ref: VpcCloudwatchLogGroup
+          ResourceId: 
+            Ref: VPC
+          ResourceType: VPC
+          TrafficType: ALL
+      VpcCloudwatchLogGroup:
+        Type: "AWS::Logs::LogGroup"
+        Properties: 
+          LogGroupName: 
+            Fn::Sub: "${AWS::StackName}-log_group"
+      CloudWatchLogsRole:
+        Type: "AWS::IAM::Role"
+        Properties: 
+          AssumeRolePolicyDocument:
+            "Statement": [
+              {
+                "Action": [
+                    "sts:AssumeRole"
+                ],
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": [
+                        "logs.amazonaws.com"
+                    ]
+                }
+              }
+            ]
+      CloudWatchLogsPolicy:
+        Type: "AWS::IAM::Policy"
+        Properties: 
+          PolicyName: 
+            Fn::Sub: "${AWS::StackName}-vpc_logs_policy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - 
+                Effect: "Allow"
+                Action: logs:*
+                Resource: "*"
+          Roles: 
+            - Ref: "CloudWatchLogsRole"
+      # VPCPeeringConnection:
+      #   Type: "AWS::EC2::VPCPeeringConnection"
+      #   Properties: 
+      #     PeerVpcId: vpc-d5451aac
+      #     VpcId:
+      #       Ref: VPC
 
