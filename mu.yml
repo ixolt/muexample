@@ -1,6 +1,9 @@
 environments:
 - name: dev
-  instanceType: m4.large
+  cluster:
+    instanceType: m4.2xlarge
+    imageId: ami-8c3667f6
+    keyName: skyland-tech-access
 - name: production
 service:
   name: muexample
