@@ -180,18 +180,18 @@ templates:
           PeerVpcId: vpc-d5451aac
           VpcId:
             Ref: VPC
-      VPNRoutePropagation:
-        Type: "AWS::EC2::VPNGatewayRoutePropagation"
-        DependsOn: VPCGatewayAttachment
-        Properties:
-          RouteTableIds:
-          - Ref: InstanceRouteTable
-          VpnGatewayId:
-            Ref: VirtualPrivateGateway
-      VPCGatewayAttachment:
-        Type: "AWS::EC2::VPCGatewayAttachment"
-        Properties:
-          VpcId:
-            Ref: VPC
-          VpnGatewayId:
-            Ref: VirtualPrivateGateway
+      # VPNRoutePropagation:
+      #   Type: "AWS::EC2::VPNGatewayRoutePropagation"
+      #   DependsOn: VPCGatewayAttachment
+      #   Properties:
+      #     RouteTableIds:
+      #     - Ref: InstanceRouteTable
+      #     VpnGatewayId:
+      #       Ref: VirtualPrivateGateway
+      # VPCGatewayAttachment:
+      #   Type: "AWS::EC2::VPCGatewayAttachment"
+      #   Properties:
+      #     VpcId:
+      #       Ref: VPC
+      #     VpnGatewayId:
+      #       Ref: VirtualPrivateGateway
