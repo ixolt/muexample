@@ -1,7 +1,7 @@
 environments:
 - name: dev
   cluster:
-    instanceType: m4.2xlarge
+    instanceType: m4.large
     imageId: ami-8c3667f6
     keyName: skyland-tech-access
 - name: production
@@ -174,10 +174,24 @@ templates:
                 Resource: "*"
           Roles: 
             - Ref: "CloudWatchLogsRole"
-      # VPCPeeringConnection:
-      #   Type: "AWS::EC2::VPCPeeringConnection"
-      #   Properties: 
-      #     PeerVpcId: vpc-d5451aac
-      #     VpcId:
-      #       Ref: VPC
-
+      VPCPeeringConnection:
+        Type: "AWS::EC2::VPCPeeringConnection"
+        Properties: 
+          PeerVpcId: vpc-d5451aac
+          VpcId:
+            Ref: VPC
+      VPNRoutePropagation:
+        Type: "AWS::EC2::VPNGatewayRoutePropagation"
+        DependsOn: VPCGatewayAttachment
+        Properties:
+          RouteTableIds:
+          - Ref: InstanceRouteTable
+          VpnGatewayId:
+            Ref: VirtualPrivateGateway
+      VPCGatewayAttachment:
+        Type: "AWS::EC2::VPCGatewayAttachment"
+        Properties:
+          VpcId:
+            Ref: VPC
+          VpnGatewayId:
+            Ref: VirtualPrivateGateway
